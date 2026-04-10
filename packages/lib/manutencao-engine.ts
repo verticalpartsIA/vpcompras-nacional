@@ -63,3 +63,91 @@ export async function determinarFluxoSolicitacao(
     motivo: 'Intervenção fora da cobertura ou acima do valor contratado. Exige reavaliação.' 
   };
 }
+
+/**
+ * Motor de Alertas em Cascata (30-7-1 dias)
+ * Engenharia (30) -> Gestor (7) -> CEO (1)
+ */
+export async function gerarAlertasProximos(equipamento_id: string) {
+  const { data: programacao, error } = await supabaseAdmin
+    .from('programacao_manutencao')
+    .select('id, data_proxima_programada, tipo_manutencao')
+    .eq('equipamento_id', equipamento_id)
+    .eq('status_programacao', 'AGENDADO')
+    .schema('vpcn_manutencao')
+    .single();
+
+  if (error || !programacao) return;
+
+  const hoje = new Date();
+  const dataManutencao = new Date(programacao.data_proxima_programada);
+  const diffDias = Math.ceil((dataManutencao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+  let destinatario = '';
+  let nivel = '';
+
+  if (diffDias <= 1) {
+    destinatario = 'CEO / FINANCEIRO';
+    nivel = 'CRÍTICO - ESCALAÇÃO DIRETA';
+  } else if (diffDias <= 7) {
+    destinatario = 'GESTOR DE DEPARTAMENTO';
+    nivel = 'ALERTA TÁTICO';
+  } else if (diffDias <= 30) {
+    destinatario = 'ENGENHARIA / TÉCNICO';
+    nivel = 'PROGRAMADA';
+  }
+
+  if (destinatario) {
+    console.log(`🔔 [MANUTENÇÃO] Alerta Nível ${nivel}:`);
+    console.log(`Ativo: ${equipamento_id} | Prazo: ${diffDias} dias | Destinatário: ${destinatario}`);
+    
+    // Trigger Realtime ou Notificação Push (Simulado)
+    await supabaseAdmin
+      .from('alertas_config')
+      .update({ 
+        [`alerta_${diffDias === 1 ? '1' : diffDias <= 7 ? '7' : '30'}_dia_ok`]: true 
+      })
+      .eq('equipamento_id', equipamento_id)
+      .schema('vpcn_manutencao');
+  }
+}
+
+/**
+ * Integração: Gera pedido de compra em Produtos se peça for trocada
+ */
+export async function gerarPedidoPecasAutomatico(equipamento_id: string, pecas: any[]) {
+  if (!pecas || pecas.length === 0) return;
+
+  const { data: solicitacao, error } = await supabaseAdmin
+    .from('solicitacoes')
+    .insert({
+      tipo_item: 'PRODUTO',
+      descricao: `Reposição de estoque: Peças trocadas na manutenção do Ativo ${equipamento_id}`,
+      observacoes: JSON.stringify(pecas),
+      status: 'EM_COTACAO',
+      urgencia: 'ALTA'
+    })
+    .schema('vpcn_produtos')
+    .select()
+    .single();
+
+  if (error) console.error("Erro ao gerar pedido de peças automático:", error);
+  return solicitacao;
+}
+
+/**
+ * Recalcula próxima data após fechamento de registro
+ */
+export async function recalcularProximaData(equipamento_id: string, frequencia_dias: number) {
+  const proxima_data = new Date();
+  proxima_data.setDate(proxima_data.getDate() + frequencia_dias);
+
+  await supabaseAdmin
+    .from('programacao_manutencao')
+    .update({ 
+      data_proxima_programada: proxima_data.toISOString().split('T')[0],
+      status_programacao: 'AGENDADO'
+    })
+    .eq('equipamento_id', equipamento_id)
+    .schema('vpcn_manutencao');
+}
