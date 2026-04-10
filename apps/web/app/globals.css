@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/**
+ * Omie ERP Design System for VerticalParts
+ * Focuses on clarity, professional data display, and corporate hierarchy.
+ * @architect-spaceX @omie-expert
+ */
+:root {
+  --omie-blue: #004884;
+  --omie-dark: #1e222d;
+  --omie-teal: #00b4a0;
+  --omie-orange: #ff6a00;
+  --omie-bg: #f5f7f9;
+  --omie-text: #333333;
+  --omie-border: #e2e8f0;
+}
+
+@theme {
+  --color-omie-blue: var(--omie-blue);
+  --color-omie-dark: var(--omie-dark);
+  --color-omie-teal: var(--omie-teal);
+  --color-omie-orange: var(--omie-orange);
+}
+
+body {
+  color: var(--omie-text);
+  background: var(--omie-bg);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Omie-style Layout Utilities */
+.omie-card {
+  @apply bg-white border border-[var(--omie-border)] rounded shadow-sm;
+}
+
+.omie-header {
+  @apply bg-white border-b border-[var(--omie-border)] px-8 py-4 mb-6;
+}
+
+.omie-sidebar {
+  @apply bg-[var(--omie-dark)] text-white w-64 min-h-screen hidden lg:block;
+}
+
+.omie-btn-primary {
+  @apply bg-[var(--omie-blue)] hover:bg-[#003666] text-white px-4 py-2 rounded font-semibold transition-all flex items-center gap-2;
+}
+
+/* Data Table Standard */
+.omie-table th {
+  @apply bg-gray-50 text-[10px] uppercase font-bold text-gray-400 py-3 px-6 tracking-wider;
+}
+
+.omie-table td {
+  @apply py-4 px-6 border-b border-gray-50 text-sm;
+}

@@ -1,0 +1,27 @@
+# Project: vpcompras-nacionais
+# Standard: SpaceX Engineering
+
+# IDEs
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.txt
+access_credentials.txt
+
+# Supabase
+.supabase/
+supabase/.temp/
+
+# Build
+.next/
+out/
+build/
+dist/

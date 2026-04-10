@@ -1,0 +1,14 @@
+{
+  "name": "vpcompras-nacionais",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter vpcompras-nacionais-web dev",
+    "build": "pnpm --filter vpcompras-nacionais-web build",
+    "start": "pnpm --filter vpcompras-nacionais-web start",
+    "lint": "pnpm --recursive lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "turbo": "latest"
+  }
+}

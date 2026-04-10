@@ -1,0 +1,13 @@
+{
+  "name": "@vpcn/lib",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./approval-engine.ts",
+  "types": "./approval-engine.ts",
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
